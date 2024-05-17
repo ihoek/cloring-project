@@ -8,7 +8,9 @@ import StackNavigator from './navigation/StackNavigator'
 export default function App() {
   console.disableYellowBox = true;
 
+
   return ( 
+    
   <NavigationContainer>
     <StatusBar style="black" />
     <StackNavigator/>
