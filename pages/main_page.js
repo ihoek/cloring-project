@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Alert, ImageBackground, Image } from 'react-native';
 import * as Location from 'expo-location';
 
+
 export default function Mainpage({ navigation, route }) {
     //모달
     const [weatherModalVisible, setWeatherModalVisible] = useState(false);
@@ -11,10 +12,33 @@ export default function Mainpage({ navigation, route }) {
     const [BodyBottomModalVisible, setBodyBottomModalVisible] = useState(false);
 
     const [currentAddress, setCurrentAddress] = useState(""); // 현재 주소를 저장할 상태 변수
-    
-    // 기본값 설정
-    const { topImage } = route.params || { topImage: require('app-cloring/assets/empty.png') }; 
 
+    const [pickerValue, setPickerValue] = useState("1");
+    
+    const [topImage, setTopImage] = useState(null);
+    const [bottomImage, setBottomImage] = useState(null);
+    const [accessoryImage, setAccessoryImage] = useState(null);
+
+    
+    useEffect(() => {
+      if (route.params) {
+          const { topImage, bottomImage, accessoryImage } = route.params;
+          if (topImage) {
+            console.log('상의 이미지를 정상적으로 받음');
+            setTopImage(topImage);}
+          if (bottomImage) {
+            console.log('하의 이미지를 정상적으로 받음');
+            setBottomImage(bottomImage);
+          }
+          if (accessoryImage){
+            console.log('악세사리 이미지를 정상적으로 받음');
+            setAccessoryImage(accessoryImage);
+          } 
+      }
+  }, [route.params]);
+    
+
+  
       /*
     useEffect(() => {
       console.log(route)
@@ -25,7 +49,8 @@ export default function Mainpage({ navigation, route }) {
       },[]);
         
 */
-      
+
+
     const getLocation = async () => {
         try {
             await Location.requestForegroundPermissionsAsync();
@@ -115,6 +140,14 @@ export default function Mainpage({ navigation, route }) {
         setBodyBottomModalVisible(false);
         console.log('modal-close');
     };
+    
+
+    //즐겨찾기 함수
+    const selectPicker = async () => {
+      console.log('selectPicker useing');
+      
+      
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -191,7 +224,7 @@ export default function Mainpage({ navigation, route }) {
                     <View style={styles.HeadmodalView}>
                         {/*top section*/}
                         <View>
-                            <Text style={styles.modalText}>머리모달</Text>
+                            <Text style={styles.modalText}>악세사리모달</Text>
                         </View>
 
                         {/*mid section*/}
@@ -222,6 +255,10 @@ export default function Mainpage({ navigation, route }) {
 
                         {/*mid section*/}
                         <View>
+                          <Text style={styles.modalText}>제품명 : </Text>
+                          <Text style={styles.modalText}>소재 : </Text>
+                          <Text style={styles.modalText}>구입날짜 : </Text>
+
                         </View>
                         {/*bottom section*/}
                         <View>
@@ -264,17 +301,18 @@ export default function Mainpage({ navigation, route }) {
 
             {/* middle section */}
             <View style={styles.containerTwo}>
-                <TouchableOpacity style={styles.middleButton01}><Text style={styles.middleButtonText}>즐겨찾기</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.middleButton01} onPress={selectPicker}><Text style={styles.middleButtonText}>즐겨찾기</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.middleButton02} onPress={styleModalUp}><Text style={styles.middleButtonText}>추천코디</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.middleButton03} onPress={weatherModalUp}><Text style={styles.middleButtonText}>날씨정보</Text></TouchableOpacity>
+                
             </View>
 
             {/* main section - person section */}
             <View style={styles.containerThree}>
                 <ImageBackground source={require('app-cloring/assets/man.png')} resizeMode="contain" style={styles.personpicture}>
-                    <TouchableOpacity style={styles.mainpersonhead} onPress={headModalUp}></TouchableOpacity>
-                    <TouchableOpacity style={styles.mainpersonbody_top} onPress={bodytopModalUp}><Image source={topImage} style={styles.iamge_top}/></TouchableOpacity>
-                    <TouchableOpacity style={styles.mainpersonbody_bottom} onPress={bodybottomModalUp}></TouchableOpacity>
+                    <TouchableOpacity style={styles.mainpersonhead} onPress={headModalUp}>{accessoryImage && <Image source={{ uri: accessoryImage }} style={styles.imageStyle} />}</TouchableOpacity>
+                    <TouchableOpacity style={styles.mainpersonbody_top} onPress={bodytopModalUp}>{topImage && <Image source={{ uri: topImage }} style={styles.imageStyle} />}</TouchableOpacity>
+                    <TouchableOpacity style={styles.mainpersonbody_bottom} onPress={bodybottomModalUp}>{bottomImage && <Image source={{ uri: bottomImage }} style={styles.imageStyle} />}</TouchableOpacity>
                 </ImageBackground>
             </View>
 
@@ -473,23 +511,21 @@ const styles = StyleSheet.create({
   },
   mainpersonhead: {
     position: 'absolute',
-    //backgroundColor: 'rgba(255, 255, 255, 0)',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     padding: 10,
     borderRadius: 5,
     margin: 3,
     top : 0,
-    left : 125,
     width : 150,
     height : 110
   },
   mainpersonbody_top:{
     position: 'absolute',
-    //backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 5,
     margin: 3,
     top : 120,
-    left : 100,
     width : 205,
     height : 240
   },
@@ -501,12 +537,11 @@ const styles = StyleSheet.create({
   },
   mainpersonbody_bottom:{
     position: 'absolute',
-    //backgroundColor: 'rgba(255, 255, 255, 0)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 5,
     margin: 3,
     top : 350,
-    left : 125,
     width : 150,
     height : 180
   },
@@ -557,6 +592,11 @@ const styles = StyleSheet.create({
     height : 70,
     top : -15,
     left : 35
-  }
+  },
+  imageStyle: {
+    width: 100,
+    height: 100,
+    margin: 10,
+},
   
 });

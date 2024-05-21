@@ -1,87 +1,125 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image ,Modal, SafeAreaView, TextInput } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, Modal, SafeAreaView, TextInput } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-//import { Camera, CameraType } from 'expo-camera';
+import { Picker } from '@react-native-picker/picker';
+import { Camera, CameraType } from 'expo-camera';
+import { ImageContext } from './ImageContext'; 
 
 export default function ClothesPage({ onClose, navigation, route, content }) {
-    //모달
+    const { images, setImages } = useContext(ImageContext);
     const [ClothesModalVisible, setClothesModalVisible] = useState(false);
     const [ClothesContentModalVisible, setClothesContentModalVisible] = useState(false);
-    // 이미지
-    const [images, setImages] = useState([null, null, null, null, null]); // 카드별 이미지 저장 배열
-    const [selectedIndex, setSelectedIndex] = useState(null); // 선택된 카드 인덱스
-    //const [type, setType] = useState(CameraType.back);
-    // 카메라
-    //const [permission, requestPermission] = Camera.useCameraPermissions();
+    const [CameraModalVisible, setCameraModalVisible] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(null);
+    const [type, setType] = useState(CameraType.back);
+    const [permission, requestPermission] = Camera.useCameraPermissions();
+    const [cameraRef, setCameraRef] = useState(null);
 
+    const [cardCategories, setCardCategories] = useState(["상의", "하의", "악세사리", "상의", "하의", "악세사리", "상의"]);
+    const [cardNames, setCardNames] = useState(["", "", "", "", "", "", ""]);
+    const [cardMaterials, setCardMaterials] = useState(["", "", "", "", "", "", ""]);
+    const [cardBuyDates, setCardBuyDates] = useState(["", "", "", "", "", "", ""]);
 
+    const [pickerValue, setPickerValue] = useState("0");
+    const [isPickerVisible, setPickerVisible] = useState(false);
+    const [selectedFilter, setSelectedFilter] = useState('모두');
 
-    const [nametext, onChangenameText] = React.useState('');
-    const [context, onChangeconText] = React.useState('');
-    const [buytext, onChangebuyText] = React.useState('');
+    useEffect(() => {
+        if (permission && !permission.granted) {
+            requestPermission();
+        }
+    }, [permission]);
 
-    
+    if (!permission || !permission.granted) {
+        return <View />;
+    }
 
+    function toggleCameraType() {
+        setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
+    }
 
-    // 옷 이미지 모달 열기
     const ClothesModalUp = async (index) => {
         try {
-            setSelectedIndex(index); // 클릭된 카드 인덱스 설정
+            setSelectedIndex(index);
             setClothesModalVisible(true);
-            console.log('clothes-modal-open');
-            console.log(index);
         } catch (error) {
             console.error('옷 이미지 모달 열기 중 오류 발생:', error);
         }
     };
 
-    // 옷 내용 모달 열기
     const ClothesContentModalUp = async (index) => {
-      try {
-          setSelectedIndex(index); // 클릭된 카드 인덱스 설정
-          setClothesContentModalVisible(true);
-          console.log('clothes-content-modal-open');
-      } catch (error) {
-          console.error('옷 내용 모달 열기 중 오류 발생:', error);
-      }
-  };
+        try {
+            setSelectedIndex(index);
+            setClothesContentModalVisible(true);
+        } catch (error) {
+            console.error('옷 내용 모달 열기 중 오류 발생:', error);
+        }
+    };
 
-    // 모달 닫기 함수
+    const CameraModalUp = async (index) => {
+        try {
+            setSelectedIndex(index);
+            setCameraModalVisible(true);
+        } catch (error) {
+            console.error('카메라 모달 열기 중 오류 발생:', error);
+        }
+    };
+
+    const takePicture = async () => {
+        if (cameraRef) {
+            try {
+                console.log('takepicture 실행중');
+                const photo = await cameraRef.takePictureAsync();
+                const { uri } = photo;
+
+                const newImages = [...images];
+                newImages[selectedIndex] = uri;
+                setImages(newImages);
+
+                setCameraModalVisible(false);
+            } catch (error) {
+                console.error('사진 찍기 중 오류 발생:', error);
+            }
+        } else {
+            console.error('Camera reference is null.');
+        }
+    };
+
     const closeModal = () => {
         setClothesModalVisible(false);
         setClothesContentModalVisible(false);
-        console.log('modal-close');
+        setCameraModalVisible(false);
     };
 
-    // 등록 버튼 함수
     const imageregister = async (index) => {
-        console.log('image register ~ing');
-        if (images[0]) { // 첫 번째 이미지가 존재하는지 확인
-          navigation.navigate('MainPage', { topImage: images[0] }); // 첫 번째 이미지를 메인화면으로 전달
-      } else {
-          navigation.navigate('MainPage', { topImage: require('app-cloring/assets/top1.png') });
-          console.log('상의 이미지가 선택되지 않았습니다.'); // 상의 이미지가 선택되지 않았을 경우 로그 출력
-      }
-      setClothesModalVisible(false);
+        const category = cardCategories[selectedIndex];
+        const image = images[selectedIndex];
+    
+        if (image) {
+            if (category === '상의') {
+                console.log('상의가 전송되고 있음');
+                navigation.navigate('MainPage', { topImage: image });
+            } else if (category === '하의') {
+                console.log('하의가 전송되고 있음');
+                navigation.navigate('MainPage', { bottomImage: image });
+            } else if (category === '악세사리') {
+                console.log('악세사리가 전송되고 있음');
+                navigation.navigate('MainPage', { accessoryImage: image });
+            }
+        } else {
+            navigation.navigate('MainPage', { topImage: require('app-cloring/assets/top1.png') });
+        }
+    
+        setClothesModalVisible(false);
     };
 
-    // 카메라 버튼 클릭 함수
-    const cameraimgbtn = async () => {
-        console.log('camera btn click');
-    };
-
-    // 수정 버튼 클릭 함수
     const modibtn = async () => {
-        console.log('modify btn click');
-        
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
         });
-
-        console.log(result);
 
         if (!result.canceled) {
             const newImages = [...images];
@@ -91,17 +129,43 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
         }
     };
 
-    // 삭제 버튼 클릭 함수
     const delbtn = async () => {
-        console.log('delete btn click');
-        
-        setClothesModalVisible(false);
+        try {
+            const newImages = [...images];
+            newImages[selectedIndex] = null;
+            setImages(newImages);
+            setClothesModalVisible(false);
+        } catch (error) {
+            console.error('삭제 버튼 클릭 중 오류 발생:', error);
+        }
     };
 
+    const Category = async () => {
+        setPickerVisible(!isPickerVisible);
+    };
+
+    const handlePickerValueChange = (itemValue) => {
+        setPickerValue(itemValue);
+        const categoryLabel = itemValue === "1" ? "상의" : itemValue === "2" ? "하의" : itemValue === "3" ? "악세사리" : "";
+        const newCategories = [...cardCategories];
+        newCategories[selectedIndex] = categoryLabel;
+        setCardCategories(newCategories);
+    };
+
+    const setFilter = (filter) => {
+        setSelectedFilter(filter);
+    };
+
+    const getFilteredCards = () => {
+        if (selectedFilter === '모두') {
+            return [0, 1, 2, 3, 4, 5, 6, 7];
+        }
+        return [0, 1, 2, 3, 4, 5, 6, 7].filter((index) => {
+            return cardCategories[index] === selectedFilter;
+        });
+    };
     return (
         <SafeAreaView style={styles.container}>
-
-            {/* 옷 이미지 모달 */}
             <Modal
                 animationType="none"
                 transparent={true}
@@ -111,25 +175,30 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
                 }}>
                 <View style={styles.imagemodalcon}>
                     <View style={styles.stylemodalView}>
-                        {/*top section*/}
                         <View style={styles.camerasection}>
                             <Text style={styles.modalText}>이미지 삽입</Text>
-                            <TouchableOpacity style={styles.cameraimage} onPress={cameraimgbtn}><Image source={require('app-cloring/assets/camera.png')} /></TouchableOpacity>
+                            <TouchableOpacity style={styles.cameraimage} onPress={() => CameraModalUp(selectedIndex)}>
+                                <Image source={require('app-cloring/assets/camera.png')} />
+                            </TouchableOpacity>
                         </View>
-
-                        {/*bottom section*/}
                         <View style={styles.camerasection}>
-                            <TouchableOpacity style={styles.ModalCloseButton} onPress={imageregister}><Text style={styles.bottomButtonText}>등록</Text></TouchableOpacity>
-                            <TouchableOpacity style={styles.ModalCloseButton} onPress={modibtn}><Text style={styles.bottomButtonText}>수정</Text></TouchableOpacity>
-                            <TouchableOpacity style={styles.ModalCloseButton} onPress={delbtn}><Text style={styles.bottomButtonText}>삭제</Text></TouchableOpacity>
-                            <TouchableOpacity style={styles.ModalCloseButton} onPress={closeModal}><Text style={styles.bottomButtonText}>닫기</Text></TouchableOpacity>
+                            <TouchableOpacity style={styles.ModalCloseButton} onPress={imageregister}>
+                                <Text style={styles.bottomButtonText}>등록</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.ModalCloseButton} onPress={modibtn}>
+                                <Text style={styles.bottomButtonText}>수정</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.ModalCloseButton} onPress={delbtn}>
+                                <Text style={styles.bottomButtonText}>삭제</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.ModalCloseButton} onPress={closeModal}>
+                                <Text style={styles.bottomButtonText}>닫기</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
             </Modal>
 
-
-            {/* 옷 내용 모달 */}
             <Modal
                 animationType="none"
                 transparent={true}
@@ -139,84 +208,159 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
                 }}>
                 <View style={styles.imagemodalcon}>
                     <View style={styles.stylemodalView}>
-                        {/*top section*/}
                         <View style={styles.clothescontent}>
-                          <View style={styles.contentrow}>
-                            <Text style={styles.textStyle}>제품명</Text>
-                              <TextInput style={styles.input} onChangeText={onChangenameText} value={nametext} />
-                          </View>
+                            <View style={styles.contentrow}>
+                                <Text style={styles.textStyle}>제품명</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    onChangeText={(text) => {
+                                        const newNames = [...cardNames];
+                                        newNames[selectedIndex] = text;
+                                        setCardNames(newNames);
+                                    }}
+                                    value={cardNames[selectedIndex]}
+                                />
+                            </View>
 
-                          <View style={styles.contentrow}>
-                              <Text style={styles.textStyle}>소재</Text>
-                              <TextInput style={styles.input} onChangeText={onChangeconText} value={context} />
-                          </View>
+                            <View style={styles.contentrow}>
+                                <Text style={styles.textStyle}>소재</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    onChangeText={(text) => {
+                                        const newMaterials = [...cardMaterials];
+                                        newMaterials[selectedIndex] = text;
+                                        setCardMaterials(newMaterials);
+                                    }}
+                                    value={cardMaterials[selectedIndex]}
+                                />
+                            </View>
 
-                          <View style={styles.contentrow}>
-                              <Text style={styles.textStyle}>구입날짜</Text>
-                              <TextInput style={styles.input} onChangeText={onChangebuyText} value={buytext} />
-                          </View> 
-                        </View >
+                            <View style={styles.contentrow}>
+                                <Text style={styles.textStyle}>구입날짜</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    onChangeText={(text) => {
+                                        const newBuyDates = [...cardBuyDates];
+                                        newBuyDates[selectedIndex] = text;
+                                        setCardBuyDates(newBuyDates);
+                                    }}
+                                    value={cardBuyDates[selectedIndex]}
+                                />
+                            </View>
+                        </View>
 
-                        {/*bottom section*/}
                         <View style={styles.camerasection}>
-                            <TouchableOpacity style={styles.ModalCloseButton} onPress={closeModal}><Text style={styles.bottomButtonText}>닫기</Text></TouchableOpacity>
+                            <TouchableOpacity style={styles.CateButton} onPress={Category}>
+                                <Text style={styles.bottomButtonText}>카테고리</Text>
+                            </TouchableOpacity>
+                            <View style={styles.pickersection}>
+                                {isPickerVisible && (
+                                    <Picker style={styles.selectpicker} selectedValue={pickerValue} onValueChange={handlePickerValueChange}>
+                                        <Picker.Item label="상의" value="1" />
+                                        <Picker.Item label="하의" value="2" />
+                                        <Picker.Item label="악세사리" value="3" />
+                                    </Picker>
+                                )}
+                            </View>
+                            <TouchableOpacity style={styles.ModalCloseButton} onPress={closeModal}>
+                                <Text style={styles.bottomButtonText}>닫기</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
-                    
                 </View>
             </Modal>
 
+            <Modal
+                animationType="none"
+                transparent={true}
+                visible={CameraModalVisible}
+                onRequestClose={() => {
+                    setCameraModalVisible(false);
+                }}>
+                <View style={styles.imagemodalcon}>
+                    <View style={styles.camerastylemodalView}>
+                        <View style={styles.camerasection_top}>
+                            <Camera style={styles.camera} type={type} ref={(ref) => setCameraRef(ref)}>
+                            </Camera>
+                        </View>
+                        <View style={styles.camerasection_bot}>
+                            <View style={styles.cards}>
+                                <TouchableOpacity style={styles.ModalCloseButton} onPress={toggleCameraType}>
+                                    <Text style={styles.bottomButtonText}>전환</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalCloseButton} onPress={takePicture}>
+                                    <Text style={styles.bottomButtonText}>확인</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
-
-
-            {/* top section */}
             <View style={styles.containerOne}>
-                <TouchableOpacity style={styles.topButton01}><Text style={styles.middleButtonText}>메뉴</Text></TouchableOpacity>
-            </View>
-            {/* middle section */}
-            <View style={styles.containerTwo}>
-                <TouchableOpacity style={styles.middleButton01}><Text style={styles.middleButtonText}>모두</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.middleButton01}><Text style={styles.middleButtonText}>상의</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.middleButton01}><Text style={styles.middleButtonText}>하의</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.middleButton01}><Text style={styles.middleButtonText}>악세사리</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.topButton01}>
+                    <Text style={styles.middleButtonText}>메뉴</Text>
+                </TouchableOpacity>
             </View>
 
-            {/* body section */}
+            <View style={styles.containerTwo}>
+                <TouchableOpacity style={styles.middleButton01} onPress={() => setFilter('모두')}>
+                    <Text style={styles.middleButtonText}>모두</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.middleButton01} onPress={() => setFilter('상의')}>
+                    <Text style={styles.middleButtonText}>상의</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.middleButton01} onPress={() => setFilter('하의')}>
+                    <Text style={styles.middleButtonText}>하의</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.middleButton01} onPress={() => setFilter('악세사리')}>
+                    <Text style={styles.middleButtonText}>악세사리</Text>
+                </TouchableOpacity>
+            </View>
+
             <View style={styles.containerThree}>
                 <ScrollView style={styles.container}>
-                    <View style={styles.cards}>
-                        <TouchableOpacity style={styles.cardsphoto} onPress={() => ClothesModalUp(0)}>
-                            <Image source={images[0] ? { uri: images[0] } : require('app-cloring/assets/top1.png')} style={styles.imageStyle} />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.cardscontent} onPress={ClothesContentModalUp}>
-                            <View style={styles.cardsfield}>
-                              <Text style={styles.textStyle}>제품명 : </Text>
-                              <Text style={styles.textStyle}>{nametext}</Text>
-                            </View>
-                            
-                            <View style={styles.cardsfield}>
-                              <Text style={styles.textStyle}>소재 : </Text>
-                              <Text style={styles.textStyle}>{context}</Text>
-                            </View>
-                            
-                            <View style={styles.cardsfield}>
-                              <Text style={styles.textStyle}>구입날짜 : </Text>
-                              <Text style={styles.textStyle}>{buytext}</Text>
-                            </View>
-                            
-                        </TouchableOpacity>
-                    </View>
+                    {getFilteredCards().map((index) => (
+                        <View style={styles.cards} key={index}>
+                            <TouchableOpacity style={styles.cardsphoto} onPress={() => ClothesModalUp(index)}>
+                                <Image source={images[index] ? { uri: images[index] } : require('app-cloring/assets/empty.png')} style={styles.imageStyle} />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.cardscontent} onPress={() => ClothesContentModalUp(index)}>
+                                <View style={styles.cardsfield}>
+                                    <Text style={styles.textStyle}>제품명 : </Text>
+                                    <Text style={styles.textStyle}>{cardNames[index]}</Text>
+                                </View>
 
+                                <View style={styles.cardsfield}>
+                                    <Text style={styles.textStyle}>소재 : </Text>
+                                    <Text style={styles.textStyle}>{cardMaterials[index]}</Text>
+                                </View>
 
+                                <View style={styles.cardsfield}>
+                                    <Text style={styles.textStyle}>구입날짜 : </Text>
+                                    <Text style={styles.textStyle}>{cardBuyDates[index]}</Text>
+                                </View>
+
+                                <View style={styles.cardsfield}>
+                                    <Text style={styles.textStyle}>카테고리 : </Text>
+                                    <Text style={styles.textStyle}>{cardCategories[index]}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
                 </ScrollView>
             </View>
-            {/* bottom section */}
             <View style={styles.containerFour}>
-                <TouchableOpacity style={styles.bottomButton01}><Text style={styles.bottomButtonText}>옷</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton02} onPress={() => { navigation.navigate('MainPage') }}><Text style={styles.bottomButtonText}>메인</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton03} onPress={() => { navigation.navigate('MyPage') }}><Text style={styles.bottomButtonText}>개인정보</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButton01}>
+                    <Text style={styles.bottomButtonText}>옷</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButton02} onPress={() => { navigation.navigate('MainPage') }}>
+                    <Text style={styles.bottomButtonText}>메인</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButton03} onPress={() => { navigation.navigate('MyPage') }}>
+                    <Text style={styles.bottomButtonText}>개인정보</Text>
+                </TouchableOpacity>
             </View>
-
         </SafeAreaView>
     );
 }
@@ -358,7 +502,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 35,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
     ModalCloseButton: {
         width: 50,
@@ -401,5 +545,85 @@ const styles = StyleSheet.create({
     },
     cardsfield:{
       flexDirection: 'row'
-    }
+    },
+    CateButton: {
+        width: 70,
+        height: 50,
+        padding: 15,
+        backgroundColor: "#fdc453",
+        borderColor: "deeppink",
+        borderRadius: 15,
+        margin: 7
+    },
+    pickersection:{
+        width: 120,
+        height: 50,
+        //backgroundColor : 'black'
+    },
+    camerastylemodalView:{
+        width: 300,
+        height: 500,
+        margin: 20,
+        borderColor: '#000',
+        borderWidth: 1,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    camera:{
+        flex : 1,
+        width : 280
+    },
+    camerasection_top:{
+        flex : 6,
+        //backgroundColor : 'black'
+    },
+    camerasection_bot:{
+        flex : 1,
+    },
+    cameraControl: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        margin: 20,
+    },
+    captureButton: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        padding: 10,
+        margin: 20,
+    },
+    captureButtonText: {
+        fontSize: 18,
+        color: 'black',
+    },
+    flipButton: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        padding: 10,
+        margin: 20,
+    },
+    flipButtonText: {
+        fontSize: 18,
+        color: 'black',
+    },
+    closeButton: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        padding: 10,
+        margin: 20,
+    },
+    closeButtonText: {
+        fontSize: 18,
+        color: 'black',
+    },
+    
 });
