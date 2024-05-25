@@ -351,15 +351,9 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
                 </ScrollView>
             </View>
             <View style={styles.containerFour}>
-                <TouchableOpacity style={styles.bottomButton01}>
-                    <Text style={styles.bottomButtonText}>옷</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton02} onPress={() => { navigation.navigate('MainPage') }}>
-                    <Text style={styles.bottomButtonText}>메인</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton03} onPress={() => { navigation.navigate('MyPage') }}>
-                    <Text style={styles.bottomButtonText}>개인정보</Text>
-                </TouchableOpacity>
+            <TouchableOpacity style={styles.bottomButton01} onPress={() => { navigation.navigate('ClothesPage') }}><Image source={require('app-cloring/assets/clothe.png')} style={styles.clothebtn}/></TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButton02}  onPress={() => { navigation.navigate('MainPage')}}><Image source={require('app-cloring/assets/home.png')} style={styles.homebtn}/></TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButton03} onPress={() => { navigation.navigate('MyPage') }}><Image source={require('app-cloring/assets/private.png')} style={styles.clothebtn}/></TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -383,33 +377,27 @@ const styles = StyleSheet.create({
     },
     containerFour: {
         flex: 0.7,
-        flexDirection: "row"
+        flexDirection: "row",
+        backgroundColor : '#36251b',
+        justifyContent: 'center'
     },
     bottomButton01: {
         width: 100,
         height: 70,
         padding: 15,
-        backgroundColor: "#fdc453",
-        borderColor: "deeppink",
-        borderRadius: 15,
         margin: 7
     },
-    bottomButton02: {
+      bottomButton02: {
         width: 170,
         height: 70,
         padding: 15,
-        backgroundColor: "#fdc453",
-        borderColor: "deeppink",
         borderRadius: 15,
         margin: 7
     },
-    bottomButton03: {
+      bottomButton03: {
         width: 100,
         height: 70,
         padding: 15,
-        backgroundColor: "#fdc453",
-        borderColor: "deeppink",
-        borderRadius: 15,
         margin: 7
     },
     bottomButtonText: {
@@ -625,5 +613,20 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'black',
     },
-    
+    clothebtn:{
+        width : 70,
+        height : 70,
+        top : -15
+      },
+      homebtn:{
+        width : 70,
+        height : 70,
+        top : -15,
+        left : 35
+      },
+      imageStyle: {
+        width: 100,
+        height: 100,
+        margin: 10,
+      }
 });

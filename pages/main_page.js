@@ -1,25 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Alert, ImageBackground, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Alert, ImageBackground, Image,Dimensions } from 'react-native';
 import * as Location from 'expo-location';
-
+import axios from 'axios';
 
 export default function Mainpage({ navigation, route }) {
-    //모달
+    //모달 상태 변수
     const [weatherModalVisible, setWeatherModalVisible] = useState(false);
     const [styleModalVisible, setStyleModalVisible] = useState(false);
     const [HeadModalVisible, setHeadModalVisible] = useState(false);
     const [BodyTopModalVisible, setBodyTopModalVisible] = useState(false);
     const [BodyBottomModalVisible, setBodyBottomModalVisible] = useState(false);
+    const [BookmarkmodalVisible, setBookmarkModalVisible] = useState(false);
 
-    const [currentAddress, setCurrentAddress] = useState(""); // 현재 주소를 저장할 상태 변수
+    // 현재 주소를 저장할 상태 변수
+    const [currentAddress, setCurrentAddress] = useState(""); 
 
-    const [pickerValue, setPickerValue] = useState("1");
+    // 현재 날씨 저장할 상태 변수
+    const [currentWeather, setCurrentWeather] = useState("");
+
+    //현재 날씨 API one call 3.0 key
+    //const API_KEY = "bb5c7d6f8aed715848b2030f20cc4ad0";
     
+    //clothes_page에서 받은 이미지 저장 변수
     const [topImage, setTopImage] = useState(null);
     const [bottomImage, setBottomImage] = useState(null);
     const [accessoryImage, setAccessoryImage] = useState(null);
 
+    //즐겨찾기용 변수
+    const [selectedOption, setSelectedOption] = useState('');
+    const [imageUri, setImageUri] = useState(null); // 사진 URI 상태 추가
     
+    const handleOptionSelect = (option) => {
+      setSelectedOption(option);
+      closeModal();
+    };
+    
+    const bookmarkmodalup = () => {
+      console.log('bookmarkmodalup');
+      setBookmarkModalVisible(true);
+    };
+    
+    // 등록 버튼 누를 때 처리 로직 - 임시로 사진 등록 로직 추가
+    const handleRegister = () => {
+      const dummyImageUri = 'https://via.placeholder.com/150'; // 임시 이미지 URI
+      setImageUri(dummyImageUri);
+      closeModal();
+    };
+
+    //즐겨찾기 삭제 버튼 
+    const handleDelete = () => {  
+      setImageUri(null); // 이미지 URI 초기화
+      closeModal();
+    };
+
+
     useEffect(() => {
       if (route.params) {
           const { topImage, bottomImage, accessoryImage } = route.params;
@@ -36,21 +70,8 @@ export default function Mainpage({ navigation, route }) {
           } 
       }
   }, [route.params]);
-    
 
-  
-      /*
-    useEffect(() => {
-      console.log(route)
-      /*navigation.setOptions({
-        title : '메인화면'
-      })
-      setTip(route.params)
-      },[]);
-        
-*/
-
-
+    //위치 가져오기
     const getLocation = async () => {
         try {
             await Location.requestForegroundPermissionsAsync();
@@ -67,7 +88,14 @@ export default function Mainpage({ navigation, route }) {
     const getAddressFromCoords = async (latitude, longitude) => {
         try {
             const location = await Location.reverseGeocodeAsync({ latitude, longitude }, { useGoogleMaps: false });
-            const address = `${location[0].region} ${location[0].city}`;
+            if(location[0].region==null){
+              address = `${location[0].city}`;
+              //console.log(location[0].region);
+            }else{
+              address = `${location[0].region} ${location[0].city}`;
+            }
+            //console.log(address);
+            console.log(location[0].region + location[0].city);
             return address;
         } catch (error) {
             console.error('주소를 가져오는 중 오류 발생:', error);
@@ -75,17 +103,53 @@ export default function Mainpage({ navigation, route }) {
         }
     };
 
+    //날씨 가져오기 함수
+    const getWeather = async (latitude, longitude) => {
+      try {
+        console.log('날씨 가져오기 함수 실행 중');
+        const result = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`);
+        
+        const temp = result.data.main.temp;//온도
+        const condition = result.data.weather[0].main;//날씨(구름, 맑음, 비 등등..)
+        const feel_like = result.data.main.feels_like;//체감온도
+        const temp_max = result.data.main.temp_max;//최고 온도
+        const temp_min = result.data.main.temp_min;//최저 온도
+        const humidity = result.data.main.humidity//습도
+
+        console.log('날씨 변수 모두 호출 완료');
+        console.log('temp : ' + temp-275.15);
+        console.log('condition : ' + condition);
+          return {
+            temp,
+            condition,
+            feel_like,
+            temp_max,
+            temp_min,
+            humidity
+          };
+      } catch (error) {
+          console.error('날씨를 가져오는 중 오류 발생:', error);
+          return '날씨를 가져올 수 없음';
+      }
+    };
+    
     //날씨정보 모달 열기
     const weatherModalUp = async () => {
         try {
-            const coords = await getLocation(); // 현재의 경도와 위도 가져오기
+          // 현재의 경도와 위도 가져오기
+            const coords = await getLocation(); 
+            // 현재의 경도와 위도가 유효한 경우에만 모달 열기
             if (coords) {
-                // 현재의 경도와 위도가 유효한 경우에만 모달 열기
-                const address = await getAddressFromCoords(coords.latitude, coords.longitude); // 주소 가져오기
+                // 주소 가져오기
+                const address = await getAddressFromCoords(coords.latitude, coords.longitude);
+                const weather = await getWeather(coords.latitude, coords.longitude);
+                setCurrentWeather(weather);
                 setCurrentAddress(address);
                 setWeatherModalVisible(true);
                 console.log('weather-modal-open');
             }
+            //getWeather 함수 실행 여부확인
+            //setCurrentWeather(getWeather);
         } catch (error) {
             console.error('날씨정보 모달 열기 중 오류 발생:', error);
         }
@@ -138,19 +202,68 @@ export default function Mainpage({ navigation, route }) {
         setHeadModalVisible(false);
         setBodyTopModalVisible(false);
         setBodyBottomModalVisible(false);
+        setBookmarkModalVisible(false);
         console.log('modal-close');
     };
     
 
-    //즐겨찾기 함수
-    const selectPicker = async () => {
-      console.log('selectPicker useing');
-      
-      
-    };
-
     return (
         <SafeAreaView style={styles.container}>
+            {/* 북마크 모달 */}
+            <Modal
+              animationType="none"
+              transparent={true}
+              visible={BookmarkmodalVisible}
+              onRequestClose={() => {
+                setBookmarkModalVisible(false);
+              }}>
+                <View style={styles.centeredView}>
+                  <View  style={styles.bookmodalView}>
+                    {/* 선택1 */}
+                    <View style={styles.optionContainer}>
+                      <TouchableOpacity onPress={() => handleOptionSelect('선택1')} style={styles.optionButton}>
+                        <Text style={styles.optionText}>선택1</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
+                        <Text style={styles.buttonText}>등록</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+                        <Text style={styles.buttonText}>삭제</Text>
+                      </TouchableOpacity>
+                    </View>
+                    {/* 선택2 */}
+                    <View style={styles.optionContainer}>
+                      <TouchableOpacity onPress={() => handleOptionSelect('선택2')} style={styles.optionButton}>
+                        <Text style={styles.optionText}>선택2</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
+                        <Text style={styles.buttonText}>등록</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+                        <Text style={styles.buttonText}>삭제</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* 선택3 */}
+                    <View style={styles.optionContainer}>
+                      <TouchableOpacity onPress={() => handleOptionSelect('선택3')} style={styles.optionButton}>
+                        <Text style={styles.optionText}>선택3</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
+                        <Text style={styles.buttonText}>등록</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+                        <Text style={styles.buttonText}>삭제</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity style={styles.ModalCloseButton} onPress={closeModal}>
+                    <Text style={styles.bottomButtonText}>닫기</Text>
+                  </TouchableOpacity>
+
+                  </View>
+                </View>
+              
+            </Modal>
             {/* 날씨정보 모달 */}
             <Modal
                 animationType="none"
@@ -163,7 +276,6 @@ export default function Mainpage({ navigation, route }) {
                     <View style={styles.weathermodalView}>
                         <View style={styles.modalTopView}>
                             <Text style={styles.modalText}>오늘의 날씨</Text>
-                            <Text style={styles.modalText}>위치</Text>
                             <Text style={styles.modalText}>{currentAddress}</Text>
                         </View>
                         <View style={styles.modalMidView}>
@@ -171,12 +283,22 @@ export default function Mainpage({ navigation, route }) {
                             <Text style={styles.modalText}>전반적으로 기온이 높아 더울 것으로 예상됩니다.</Text>
                         </View>
                         <View style={styles.modalBotView}>
-                            <Text style={styles.modalText}>대기질(미세먼지/초미제먼지)</Text>
-                            <Text style={styles.modalText}>매우나쁨/매우나쁨</Text>
-                            <Text style={styles.modalText}>기상현상</Text>
-                            <Text style={styles.modalText}>비가옴</Text>
-                            <Text style={styles.modalText}>습도</Text>
-                            <Text style={styles.modalText}>70%</Text>
+                        {currentWeather && (
+                                <>
+                                    <Text style={styles.modalText}>현재 온도</Text>
+                                    <Text style={styles.modalText}>{(currentWeather.temp-275.15).toFixed(2)}°C</Text>
+                                    <Text style={styles.modalText}>날씨</Text>
+                                    <Text style={styles.modalText}>{currentWeather.condition}</Text>
+                                    <Text style={styles.modalText}>체감 온도</Text>
+                                    <Text style={styles.modalText}>{(currentWeather.feel_like-275.15).toFixed(2)}°C</Text>
+                                    <Text style={styles.modalText}>최고 온도</Text>
+                                    <Text style={styles.modalText}>{(currentWeather.temp_max-275.15).toFixed(2)}°C</Text>
+                                    <Text style={styles.modalText}>최저 온도</Text>
+                                    <Text style={styles.modalText}>{(currentWeather.temp_min-275.15).toFixed(2)}°C</Text>
+                                    <Text style={styles.modalText}>습도</Text>
+                                    <Text style={styles.modalText}>{currentWeather.humidity}%</Text>
+                                </>
+                            )}
                         </View>
                         <TouchableOpacity style={styles.ModalCloseButton} onPress={closeModal}>
                             <Text style={styles.bottomButtonText}>닫기</Text>
@@ -202,6 +324,7 @@ export default function Mainpage({ navigation, route }) {
 
                         {/*mid section*/}
                         <View>
+                          <Text style={styles.modalText}>오늘의 온도는 26도 이므로 반팔에 긴바지와 같은 조합을 추천합니다</Text>
                         </View>
 
                         {/*bottom section*/}
@@ -301,7 +424,7 @@ export default function Mainpage({ navigation, route }) {
 
             {/* middle section */}
             <View style={styles.containerTwo}>
-                <TouchableOpacity style={styles.middleButton01} onPress={selectPicker}><Text style={styles.middleButtonText}>즐겨찾기</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.middleButton01} onPress={bookmarkmodalup}><Text style={styles.middleButtonText}>즐겨찾기</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.middleButton02} onPress={styleModalUp}><Text style={styles.middleButtonText}>추천코디</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.middleButton03} onPress={weatherModalUp}><Text style={styles.middleButtonText}>날씨정보</Text></TouchableOpacity>
                 
@@ -311,7 +434,7 @@ export default function Mainpage({ navigation, route }) {
             <View style={styles.containerThree}>
                 <ImageBackground source={require('app-cloring/assets/man.png')} resizeMode="contain" style={styles.personpicture}>
                     <TouchableOpacity style={styles.mainpersonhead} onPress={headModalUp}>{accessoryImage && <Image source={{ uri: accessoryImage }} style={styles.imageStyle} />}</TouchableOpacity>
-                    <TouchableOpacity style={styles.mainpersonbody_top} onPress={bodytopModalUp}>{topImage && <Image source={{ uri: topImage }} style={styles.imageStyle} />}</TouchableOpacity>
+                    <TouchableOpacity style={styles.mainpersonbody_top} onPress={bodytopModalUp}>{topImage && <Image source={{ uri: topImage }} style={styles.top_imageStyle} />}</TouchableOpacity>
                     <TouchableOpacity style={styles.mainpersonbody_bottom} onPress={bodybottomModalUp}>{bottomImage && <Image source={{ uri: bottomImage }} style={styles.imageStyle} />}</TouchableOpacity>
                 </ImageBackground>
             </View>
@@ -432,48 +555,42 @@ const styles = StyleSheet.create({
   //Modal Style
   weathermodalView: {
     width: 320,
-    height: 500,
+    height: 550,
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    borderColor:'#000',
+    borderWidth:1
   },
   modalTopView : {
-    height:70,
+    height:50,
     width : 250,
     borderColor:'#000',
     borderWidth:1,
     borderRadius:10,
-    marginBottom:10,
+    marginBottom:5,
   },
   modalMidView : {
-    height:70,
+    height:50,
     width : 250,
     borderColor:'#000',
     borderWidth:1,
     borderRadius:10,
-    margin:10,
+    margin:5,
   },
   modalBotView : {
-    height:200,
+    height:300,
     width : 250,
     borderColor:'#000',
     borderWidth:1,
     borderRadius:10,
-    margin:10,
+    margin:5,
   },
   modalText: {
     fontSize : 15,
-    marginBottom: 5,
+    marginBottom: 4,
     textAlign: 'center'
   },
   ModalCloseButton: {
@@ -597,6 +714,62 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 10,
-},
-  
+  },
+  top_imageStyle : {
+      padding: 10,
+      borderRadius: 5,
+      margin: 3,
+      top : -20,
+      width : 205,
+      height : 240
+  },
+  bookmarkmodalView : {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  bookmodalView:{
+    width: 250,
+    height: 350,
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+  },
+  optionContainer:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  optionButton: {
+    backgroundColor: '#9adbc5',
+    borderRadius: 15,
+    padding: 15,
+    marginRight: 10,
+  },
+  optionText: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+  registerButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#4CAF50',
+    borderRadius: 15,
+    padding: 10,
+    marginLeft: 10,
+  },
+  // 삭제 버튼
+  deleteButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F44336', // 삭제 버튼 색상
+    borderRadius: 15,
+    padding: 10,
+    marginLeft: 10,
+  },
+
+
 });
