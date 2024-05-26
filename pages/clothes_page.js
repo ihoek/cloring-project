@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { Camera, CameraType } from 'expo-camera';
 import { ImageContext } from './ImageContext'; 
+import { ProductContext } from './contentcontext';
 
 export default function ClothesPage({ onClose, navigation, route, content }) {
     const { images, setImages } = useContext(ImageContext);
@@ -16,13 +17,30 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
     const [cameraRef, setCameraRef] = useState(null);
 
     const [cardCategories, setCardCategories] = useState(["상의", "하의", "악세사리", "상의", "하의", "악세사리", "상의"]);
-    const [cardNames, setCardNames] = useState(["", "", "", "", "", "", ""]);
-    const [cardMaterials, setCardMaterials] = useState(["", "", "", "", "", "", ""]);
-    const [cardBuyDates, setCardBuyDates] = useState(["", "", "", "", "", "", ""]);
+    const { productInfo, setProductInfo } = useContext(ProductContext);
+    const { names, materials, buyDates } = productInfo;
+    const [cardNames, setCardNames] = useState(names);
+    const [cardMaterials, setCardMaterials] = useState(materials);
+    const [cardBuyDates, setCardBuyDates] = useState(buyDates);
 
     const [pickerValue, setPickerValue] = useState("0");
     const [isPickerVisible, setPickerVisible] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState('모두');
+
+    //상의 전달
+    const [topProductName, setTopProductName] = useState('');
+    const [topMaterial, setTopMaterial] = useState('');
+    const [topPurchaseDate, setTopPurchaseDate] = useState('');
+
+    //하의 전달
+    const [botProductName, setbotProductName] = useState('');
+    //const [botMaterial, setbotMaterial] = useState('');
+    //const [botPurchaseDate, setbotPurchaseDate] = useState('');
+
+    useEffect(() => {
+        setProductInfo({ names: cardNames, materials: cardMaterials, buyDates: cardBuyDates });
+    }, [cardNames, cardMaterials, cardBuyDates, setProductInfo]);
+
 
     useEffect(() => {
         if (permission && !permission.granted) {
@@ -91,28 +109,83 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
         setCameraModalVisible(false);
     };
 
-    const imageregister = async (index) => {
+    /*const imageregister = async (index) => {
         const category = cardCategories[selectedIndex];
         const image = images[selectedIndex];
+        const productName = cardNames[selectedIndex];
+        const material = cardMaterials[selectedIndex];
+        const purchaseDate = cardBuyDates[selectedIndex];
     
         if (image) {
             if (category === '상의') {
                 console.log('상의가 전송되고 있음');
-                navigation.navigate('MainPage', { topImage: image });
+                navigation.navigate('MainPage', { topImage: image,
+                    topproductName: topProductName, 
+                    topmaterial: topMaterial, 
+                    toppurchaseDate: topPurchaseDate
+                });
+                console.log('상의 정보가 전송되고 있음');
+
             } else if (category === '하의') {
                 console.log('하의가 전송되고 있음');
-                navigation.navigate('MainPage', { bottomImage: image });
+                navigation.navigate('MainPage', { bottomImage: image, 
+                    botproductName : botProductName, 
+                    //botmaterial : botMaterial, 
+                    //botpurchaseDate : botPurchaseDate
+                });
             } else if (category === '악세사리') {
                 console.log('악세사리가 전송되고 있음');
-                navigation.navigate('MainPage', { accessoryImage: image });
+                navigation.navigate('MainPage', { accessoryImage: image, productName, material, purchaseDate });
             }
         } else {
-            navigation.navigate('MainPage', { topImage: require('app-cloring/assets/top1.png') });
+            navigation.navigate('MainPage', { topImage: require('app-cloring/assets/top1.png'), productName, material, purchaseDate });
+        }
+    
+        setClothesModalVisible(false);
+    };*/
+    const imageregister = async (index) => {
+        const category = cardCategories[selectedIndex];
+        const image = images[selectedIndex];
+        const productName = cardNames[selectedIndex];
+        const material = cardMaterials[selectedIndex];
+        const purchaseDate = cardBuyDates[selectedIndex];
+    
+        if (image) {
+            if (category === '상의') {
+                console.log('상의가 전송되고 있음');
+                navigation.navigate('MainPage', {
+                    topImage: image,
+                    topProductName: productName,
+                    topMaterial: material,
+                    topPurchaseDate: purchaseDate
+                });
+            } else if (category === '하의') {
+                navigation.navigate('MainPage', {
+                    bottomImage: image,
+                    botProductName: productName,
+                    botMaterial: material,
+                    botPurchaseDate: purchaseDate
+                });
+            } else if (category === '악세사리') {
+                navigation.navigate('MainPage', {
+                    accessoryImage: image,
+                    accessoryProductName: productName,
+                    accessoryMaterial: material,
+                    accessoryPurchaseDate: purchaseDate
+                });
+            }
+        } else {
+            // 이미지가 없는 경우 디폴트 이미지로 넘겨줄 수 있습니다.
+            navigation.navigate('MainPage', {
+                topImage: require('app-cloring/assets/top1.png'),
+                topProductName: productName,
+                topMaterial: material,
+                topPurchaseDate: purchaseDate
+            });
         }
     
         setClothesModalVisible(false);
     };
-
     const modibtn = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -217,6 +290,8 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
                                         const newNames = [...cardNames];
                                         newNames[selectedIndex] = text;
                                         setCardNames(newNames);
+                                        //setTopProductName(text);
+                                        
                                     }}
                                     value={cardNames[selectedIndex]}
                                 />
@@ -230,6 +305,7 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
                                         const newMaterials = [...cardMaterials];
                                         newMaterials[selectedIndex] = text;
                                         setCardMaterials(newMaterials);
+                                        //setTopMaterial(text);
                                     }}
                                     value={cardMaterials[selectedIndex]}
                                 />
@@ -243,6 +319,7 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
                                         const newBuyDates = [...cardBuyDates];
                                         newBuyDates[selectedIndex] = text;
                                         setCardBuyDates(newBuyDates);
+                                        //setTopPurchaseDate(text)
                                     }}
                                     value={cardBuyDates[selectedIndex]}
                                 />
@@ -296,12 +373,6 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
                     </View>
                 </View>
             </Modal>
-
-            <View style={styles.containerOne}>
-                <TouchableOpacity style={styles.topButton01}>
-                    <Text style={styles.middleButtonText}>메뉴</Text>
-                </TouchableOpacity>
-            </View>
 
             <View style={styles.containerTwo}>
                 <TouchableOpacity style={styles.middleButton01} onPress={() => setFilter('모두')}>
@@ -362,9 +433,6 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1
-    },
-    containerOne: {
-        flex: 0.7,
     },
     containerTwo: {
         flex: 0.5,

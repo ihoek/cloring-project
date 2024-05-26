@@ -31,10 +31,25 @@ export default function Mainpage({ navigation, route }) {
     const [topmaterial, settopmaterial] = useState(null);
     const [toppurchaseDate, settoppurchaseDate] = useState(null);
 
+    const [botproductName, setbotproductName] = useState(null);
+    //const [botMaterial, setbotmaterial] = useState(null);
+    //const [botpurchaseDate, setbotpurchaseDate] = useState(null);
 
     //즐겨찾기용 변수
     const [selectedOption, setSelectedOption] = useState('');
     const [imageUri, setImageUri] = useState(null); // 사진 URI 상태 추가
+    
+    //const { productName, material, purchaseDate } = route.params || {};
+    
+     // 상의 정보 상태 변수
+     const [topInfo, setTopInfo] = useState({ productName: '', material: '', purchaseDate: '' });
+
+     // 하의 정보 상태 변수
+     const [bottomInfo, setBottomInfo] = useState({ productName: '', material: '', purchaseDate: '' });
+ 
+     // 악세사리 정보 상태 변수
+     const [accessoryInfo, setAccessoryInfo] = useState({ productName: '', material: '', purchaseDate: '' });
+ 
     
     const handleOptionSelect = (option) => {
       setSelectedOption(option);
@@ -58,43 +73,24 @@ export default function Mainpage({ navigation, route }) {
       setImageUri(null); // 이미지 URI 초기화
       closeModal();
     };
+    
 
-    const [topProductName, setTopProductName] = useState(null);
-    const [topMaterial, setTopMaterial] = useState(null);
-    const [topPurchaseDate, setTopPurchaseDate] = useState(null);
-    const [botProductName, setBotProductName] = useState(null);
-    const [botMaterial, setBotMaterial] = useState(null);
-    const [botPurchaseDate, setBotPurchaseDate] = useState(null);
-    const [accessoryProductName, setAccessoryProductName] = useState(null);
-    const [accessoryMaterial, setAccessoryMaterial] = useState(null);
-    const [accessoryPurchaseDate, setAccessoryPurchaseDate] = useState(null);
-
+    //하의정보 받음
+    /*
     useEffect(() => {
       if (route.params) {
-          const { topProductName, botProductName, accessoryProductName,
-                  topMaterial, botMaterial, accessoryMaterial,
-                  topPurchaseDate, botPurchaseDate, accessoryPurchaseDate } = route.params;
-          if (topImage) {
-              console.log('상의 값을 정상적으로 받음');
-              setTopProductName(topProductName);
-              setTopMaterial(topMaterial);
-              setTopPurchaseDate(topPurchaseDate);
-          }
-          if (bottomImage) {
-              console.log('하의 값을 정상적으로 받음');
-              setBotProductName(botProductName);
-              setBotMaterial(botMaterial);
-              setBotPurchaseDate(botPurchaseDate);
-          }
-          if (accessoryImage) {
-              console.log('악세사리 값을 정상적으로 받음');
-              setAccessoryProductName(accessoryProductName);
-              setAccessoryMaterial(accessoryMaterial);
-              setAccessoryPurchaseDate(accessoryPurchaseDate);
+          const { botproductName} = route.params;
+          //const { botMaterial} = route.params;
+          //const { botpurchaseDate} = route.params;
+          
+          if(botproductName){
+            console.log('하의값을 정상적으로 받음');
+            setbotproductName(botproductName);
+            console.log(botproductName);
           }
       }
-  }, [route.params]);
-
+    }, [route.params]);
+*/
     //상의, 하의, 악세사리 이미지 받음
     useEffect(() => {
       if (route.params) {
@@ -395,9 +391,9 @@ export default function Mainpage({ navigation, route }) {
 
                         {/*mid section*/}
                         <View>
-                          <Text style={styles.modalText}>제품명 : {accessoryProductName}</Text>
-                          <Text style={styles.modalText}>소재 : {accessoryMaterial}</Text>
-                          <Text style={styles.modalText}>구입날짜 : {accessoryPurchaseDate}</Text>
+                          <Text style={styles.modalText}>제품명 : </Text>
+                          <Text style={styles.modalText}>소재 :</Text>
+                          <Text style={styles.modalText}>구입날짜 : </Text>
                         </View>
                         {/*bottom section*/}
                         <View>
@@ -424,9 +420,9 @@ export default function Mainpage({ navigation, route }) {
 
                         {/*mid section*/}
                         <View>
-                          <Text>제품명: {topProductName} </Text>
-                          <Text>소재: {topMaterial}</Text>
-                          <Text>구입날짜: {topPurchaseDate}</Text>
+                          <Text>제품명: {topInfo.productName}</Text>
+                          <Text>소재: {topInfo.material}</Text>
+                          <Text>구입날짜: {topInfo.purchaseDate}</Text>
                         </View>
                         {/*bottom section*/}
                         <View>
@@ -453,9 +449,9 @@ export default function Mainpage({ navigation, route }) {
 
                         {/*mid section*/}
                         <View>
-                          <Text style={styles.modalText}>제품명 : {botProductName}</Text>
-                          <Text style={styles.modalText}>소재 : {botMaterial}</Text>
-                          <Text style={styles.modalText}>구입날짜 : {botPurchaseDate}</Text>
+                          <Text style={styles.modalText}>제품명 : </Text>
+                          <Text style={styles.modalText}>소재 :</Text>
+                          <Text style={styles.modalText}>구입날짜 : </Text>
                         </View>
                         {/*bottom section*/}
                         <View>
@@ -675,17 +671,17 @@ const styles = StyleSheet.create({
   },
   mainpersonhead: {
     position: 'absolute',
-    //backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     padding: 10,
     borderRadius: 5,
     margin: 3,
     top : 0,
     width : 150,
-    height : 120
+    height : 110
   },
   mainpersonbody_top:{
     position: 'absolute',
-    //backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 5,
     margin: 3,
@@ -701,13 +697,13 @@ const styles = StyleSheet.create({
   },
   mainpersonbody_bottom:{
     position: 'absolute',
-    //backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 5,
     margin: 3,
     top : 350,
     width : 150,
-    height : 230
+    height : 180
   },
   buttonText: {
     color: 'black',
@@ -820,3 +816,13 @@ const styles = StyleSheet.create({
 
 
 });
+
+const [topProductName, setTopProductName] = useState(null);
+    const [topMaterial, setTopMaterial] = useState(null);
+    const [topPurchaseDate, setTopPurchaseDate] = useState(null);
+    const [botProductName, setBotProductName] = useState(null);
+    const [botMaterial, setBotMaterial] = useState(null);
+    const [botPurchaseDate, setBotPurchaseDate] = useState(null);
+    const [accessoryProductName, setAccessoryProductName] = useState(null);
+    const [accessoryMaterial, setAccessoryMaterial] = useState(null);
+    const [accessoryPurchaseDate, setAccessoryPurchaseDate] = useState(null);
