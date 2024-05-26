@@ -16,7 +16,7 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
     const [permission, requestPermission] = Camera.useCameraPermissions();
     const [cameraRef, setCameraRef] = useState(null);
 
-    const [cardCategories, setCardCategories] = useState(["상의", "하의", "악세사리", "상의", "하의", "악세사리", "상의"]);
+    const [cardCategories, setCardCategories] = useState(["상의", "하의", "악세사리", "상의", "하의", "악세사리", "상의","상의", "하의", "악세사리","상의"]);
     const { productInfo, setProductInfo } = useContext(ProductContext);
     const { names, materials, buyDates } = productInfo;
     const [cardNames, setCardNames] = useState(names);
@@ -27,16 +27,7 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
     const [isPickerVisible, setPickerVisible] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState('모두');
 
-    //상의 전달
-    const [topProductName, setTopProductName] = useState('');
-    const [topMaterial, setTopMaterial] = useState('');
-    const [topPurchaseDate, setTopPurchaseDate] = useState('');
-
-    //하의 전달
-    const [botProductName, setbotProductName] = useState('');
-    //const [botMaterial, setbotMaterial] = useState('');
-    //const [botPurchaseDate, setbotPurchaseDate] = useState('');
-
+    
     useEffect(() => {
         setProductInfo({ names: cardNames, materials: cardMaterials, buyDates: cardBuyDates });
     }, [cardNames, cardMaterials, cardBuyDates, setProductInfo]);
@@ -109,40 +100,6 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
         setCameraModalVisible(false);
     };
 
-    /*const imageregister = async (index) => {
-        const category = cardCategories[selectedIndex];
-        const image = images[selectedIndex];
-        const productName = cardNames[selectedIndex];
-        const material = cardMaterials[selectedIndex];
-        const purchaseDate = cardBuyDates[selectedIndex];
-    
-        if (image) {
-            if (category === '상의') {
-                console.log('상의가 전송되고 있음');
-                navigation.navigate('MainPage', { topImage: image,
-                    topproductName: topProductName, 
-                    topmaterial: topMaterial, 
-                    toppurchaseDate: topPurchaseDate
-                });
-                console.log('상의 정보가 전송되고 있음');
-
-            } else if (category === '하의') {
-                console.log('하의가 전송되고 있음');
-                navigation.navigate('MainPage', { bottomImage: image, 
-                    botproductName : botProductName, 
-                    //botmaterial : botMaterial, 
-                    //botpurchaseDate : botPurchaseDate
-                });
-            } else if (category === '악세사리') {
-                console.log('악세사리가 전송되고 있음');
-                navigation.navigate('MainPage', { accessoryImage: image, productName, material, purchaseDate });
-            }
-        } else {
-            navigation.navigate('MainPage', { topImage: require('app-cloring/assets/top1.png'), productName, material, purchaseDate });
-        }
-    
-        setClothesModalVisible(false);
-    };*/
     const imageregister = async (index) => {
         const category = cardCategories[selectedIndex];
         const image = images[selectedIndex];
@@ -231,9 +188,9 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
 
     const getFilteredCards = () => {
         if (selectedFilter === '모두') {
-            return [0, 1, 2, 3, 4, 5, 6, 7];
+            return [0, 1, 2, 3, 4, 5, 6, 7,8,9,10];
         }
-        return [0, 1, 2, 3, 4, 5, 6, 7].filter((index) => {
+        return [0, 1, 2, 3, 4, 5, 6, 7,8,9,10].filter((index) => {
             return cardCategories[index] === selectedFilter;
         });
     };
@@ -444,7 +401,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     containerFour: {
-        flex: 0.7,
+        flex: 0.6,
         flexDirection: "row",
         backgroundColor : '#36251b',
         justifyContent: 'center'
@@ -682,14 +639,14 @@ const styles = StyleSheet.create({
         color: 'black',
     },
     clothebtn:{
-        width : 70,
-        height : 70,
-        top : -15
+        width : 60,
+        height : 60,
+        top : -17,
       },
       homebtn:{
-        width : 70,
-        height : 70,
-        top : -15,
+        width : 60,
+        height : 60,
+        top : -17,
         left : 35
       },
       imageStyle: {

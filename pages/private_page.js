@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     flex: 8
   },
   container_bottom : {
-    flex: 1,
+    flex: 0.9,
     flexDirection: "row",
     backgroundColor : '#36251b',
     justifyContent: 'center'
@@ -243,14 +243,14 @@ const styles = StyleSheet.create({
     marginTop: 60, 
   },
   clothebtn:{
-    width : 70,
-    height : 70,
-    top : -15
+    width : 60,
+    height : 60,
+    top : -17,
   },
   homebtn:{
-    width : 70,
-    height : 70,
-    top : -15,
+    width : 60,
+    height : 60,
+    top : -17,
     left : 35
   },
   bottomButton01: {

@@ -367,7 +367,9 @@ export default function Mainpage({ navigation, route }) {
 
                         {/*mid section*/}
                         <View>
-                          <Text style={styles.modalText}>오늘의 온도는 26도 이므로 반팔에 긴바지와 같은 조합을 추천합니다</Text>
+                          <Text style={styles.modalText}>오늘은 온도는</Text>
+                          <Text style={styles.modalText}>{(currentWeather.temp_min-275.15).toFixed(2)}°C</Text>
+                          <Text style={styles.modalText}>이므로 반팔에 긴바지와 같은 조합을 추천합니다</Text>
                         </View>
 
                         {/*bottom section*/}
@@ -482,7 +484,7 @@ export default function Mainpage({ navigation, route }) {
                 <ImageBackground source={require('app-cloring/assets/man.png')} resizeMode="contain" style={styles.personpicture}>
                     <TouchableOpacity style={styles.mainpersonhead} onPress={headModalUp}>{accessoryImage && <Image source={{ uri: accessoryImage }} style={styles.imageStyle} />}</TouchableOpacity>
                     <TouchableOpacity style={styles.mainpersonbody_top} onPress={bodytopModalUp}>{topImage && <Image source={{ uri: topImage }} style={styles.top_imageStyle} />}</TouchableOpacity>
-                    <TouchableOpacity style={styles.mainpersonbody_bottom} onPress={bodybottomModalUp}>{bottomImage && <Image source={{ uri: bottomImage }} style={styles.imageStyle} />}</TouchableOpacity>
+                    <TouchableOpacity style={styles.mainpersonbody_bottom} onPress={bodybottomModalUp}>{bottomImage && <Image source={{ uri: bottomImage }} style={styles.bot_imageStyle} />}</TouchableOpacity>
                 </ImageBackground>
             </View>
 
@@ -519,10 +521,11 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   containerFour: {
-    flex: 0.7,
+    flex: 0.6,
     flexDirection: "row",
     backgroundColor : '#36251b',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems : 'center'
   },
   topButton01: {
     width: 50,
@@ -658,20 +661,14 @@ const styles = StyleSheet.create({
   },
   stylemodalView: {
     width: 320,
-    height: 300,
-    margin: 20,
+    height: 200,
+    margin: 10,
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    borderColor:'#000',
+    borderWidth:1,
   },
   mainpersonhead: {
     position: 'absolute',
@@ -747,28 +744,40 @@ const styles = StyleSheet.create({
     left : 70
   },
   clothebtn:{
-    width : 70,
-    height : 70,
-    top : -15
+    width : 60,
+    height : 60,
+    top : -10,
   },
   homebtn:{
-    width : 70,
-    height : 70,
-    top : -15,
+    width : 60,
+    height : 60,
+    top : -10,
     left : 35
   },
   imageStyle: {
-    width: 100,
+    width: 120,
     height: 100,
     margin: 10,
+    top : -20,
+    left : -5
   },
   top_imageStyle : {
       padding: 10,
       borderRadius: 5,
       margin: 3,
       top : -20,
+      left : -15,
       width : 205,
       height : 240
+  },
+  bot_imageStyle : {
+    padding: 10,
+    borderRadius: 5,
+    margin: 3,
+    top : -10,
+    left : -40,
+    width : 205,
+    height : 210
   },
   bookmarkmodalView : {
     flex: 1,
