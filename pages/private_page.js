@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Image, Modal } from 'react-native';
 
 // 사용자 프로필 사진 가져오기
-const userProfileImage = require('../assets/top1.png');
+const userProfileImage = require('../assets/profile.png');
 
 export default function MyPage({ onClose ,navigation}) {
   const [username, setUsername] = useState("사용자");
@@ -172,7 +172,8 @@ const styles = StyleSheet.create({
     alignItems: 'left'
   },
   container_top : {
-    flex: 8
+    flex: 8,
+    margin : 15
   },
   container_bottom : {
     flex: 0.9,

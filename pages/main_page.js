@@ -19,46 +19,108 @@ export default function Mainpage({ navigation, route }) {
     const [currentWeather, setCurrentWeather] = useState("");
 
     //현재 날씨 API one call 3.0 key
-    const API_KEY = "bb5c7d6f8aed715848b2030f20cc4ad0";
+    
     
     //clothes_page에서 받은 이미지 저장 변수
     const [topImage, setTopImage] = useState(null);
     const [bottomImage, setBottomImage] = useState(null);
     const [accessoryImage, setAccessoryImage] = useState(null);
 
-    //clothes_page에서 받은  textinput값 저장 변수
-    const [topproductName, settopproductName] = useState(null);
-    const [topmaterial, settopmaterial] = useState(null);
-    const [toppurchaseDate, settoppurchaseDate] = useState(null);
-
 
     //즐겨찾기용 변수
     const [selectedOption, setSelectedOption] = useState('');
-    const [imageUri, setImageUri] = useState(null); // 사진 URI 상태 추가
+    const [bookmarks, setBookmarks] = useState({
+        option1: { topImage: null, bottomImage: null, accessoryImage: null },
+        option2: { topImage: null, bottomImage: null, accessoryImage: null },
+        option3: { topImage: null, bottomImage: null, accessoryImage: null }
+    });
     
-    const handleOptionSelect = (option) => {
-      setSelectedOption(option);
-      closeModal();
-    };
-    
+    // 즐겨찾기 모달 열기
     const bookmarkmodalup = () => {
       console.log('bookmarkmodalup');
       setBookmarkModalVisible(true);
     };
     
-    // 등록 버튼 누를 때 처리 로직 - 임시로 사진 등록 로직 추가
-    const handleRegister = () => {
-      const dummyImageUri = 'https://via.placeholder.com/150'; // 임시 이미지 URI
-      setImageUri(dummyImageUri);
+    // 1번째 등록 버튼 함수
+    const handleRegister_option1 = () => {
+      if (selectedOption) {
+        console.log('1등록버튼 실행');
+        setBookmarks(prevBookmarks => ({
+          ...prevBookmarks,
+          [selectedOption]: {
+            topImage: topImage,
+            bottomImage: bottomImage,
+            accessoryImage: accessoryImage
+          }
+        }));
+        closeModal();
+      } else {
+        Alert.alert("선택한 옵션이 없습니다.");
+      }
+  };
+
+  // 2번째 등록 버튼 함수
+  const handleRegister_option2 = () => {
+    if (selectedOption) {
+      console.log('2등록버튼 실행');
+      setBookmarks(prevBookmarks => ({
+        ...prevBookmarks,
+        [selectedOption]: {
+          topImage: topImage,
+          bottomImage: bottomImage,
+          accessoryImage: accessoryImage
+        }
+      }));
       closeModal();
-    };
+    } else {
+      Alert.alert("선택한 옵션이 없습니다.");
+    }
+  };
+
+  // 2번째 등록 버튼 함수
+  const handleRegister_option3 = () => {
+    if (selectedOption) {
+      console.log('3등록버튼 실행');
+      setBookmarks(prevBookmarks => ({
+        ...prevBookmarks,
+        [selectedOption]: {
+          topImage: topImage,
+          bottomImage: bottomImage,
+          accessoryImage: accessoryImage
+        }
+      }));
+      closeModal();
+    } else {
+      Alert.alert("선택한 옵션이 없습니다.");
+    }
+  };
+
+  // 선택 옵션 누를 때 처리 함수
+  const handleOptionSelect = (option) => {
+    console.log(`${option}번째 선택됨`);
+    setSelectedOption(option);
+
+    const selectedBookmark = bookmarks[option];
+    setTopImage(selectedBookmark.topImage);
+    setBottomImage(selectedBookmark.bottomImage);
+    setAccessoryImage(selectedBookmark.accessoryImage);
+    closeModal();
+};  
 
     //즐겨찾기 삭제 버튼 
     const handleDelete = () => {  
-      setImageUri(null); // 이미지 URI 초기화
-      closeModal();
-    };
+      if (selectedOption) {
+          setBookmarks(prevBookmarks => ({
+              ...prevBookmarks,
+              [selectedOption]: { topImage: null, bottomImage: null, accessoryImage: null }
+          }));
+          closeModal();
+      } else {
+          Alert.alert("선택한 옵션이 없습니다.");
+      }
+  };
 
+    //clothes_page에서 받은 textinput값 저장 변수
     const [topProductName, setTopProductName] = useState(null);
     const [topMaterial, setTopMaterial] = useState(null);
     const [topPurchaseDate, setTopPurchaseDate] = useState(null);
@@ -264,22 +326,23 @@ export default function Mainpage({ navigation, route }) {
                   <View  style={styles.bookmodalView}>
                     {/* 선택1 */}
                     <View style={styles.optionContainer}>
-                      <TouchableOpacity onPress={() => handleOptionSelect('선택1')} style={styles.optionButton}>
+                      <TouchableOpacity onPress={() => handleOptionSelect('option1')} style={styles.optionButton}>
                         <Text style={styles.optionText}>선택1</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
+                      <TouchableOpacity onPress={handleRegister_option1} style={styles.ModalCloseButton}>
                         <Text style={styles.buttonText}>등록</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
                         <Text style={styles.buttonText}>삭제</Text>
                       </TouchableOpacity>
                     </View>
+
                     {/* 선택2 */}
                     <View style={styles.optionContainer}>
-                      <TouchableOpacity onPress={() => handleOptionSelect('선택2')} style={styles.optionButton}>
+                      <TouchableOpacity onPress={() => handleOptionSelect('option2')} style={styles.optionButton}>
                         <Text style={styles.optionText}>선택2</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
+                      <TouchableOpacity onPress={handleRegister_option2} style={styles.ModalCloseButton}>
                         <Text style={styles.buttonText}>등록</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
@@ -289,22 +352,25 @@ export default function Mainpage({ navigation, route }) {
 
                     {/* 선택3 */}
                     <View style={styles.optionContainer}>
-                      <TouchableOpacity onPress={() => handleOptionSelect('선택3')} style={styles.optionButton}>
+                      <TouchableOpacity onPress={() => handleOptionSelect('option3')} style={styles.optionButton}>
                         <Text style={styles.optionText}>선택3</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
+                      <TouchableOpacity onPress={handleRegister_option3} style={styles.ModalCloseButton}>
                         <Text style={styles.buttonText}>등록</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
                         <Text style={styles.buttonText}>삭제</Text>
                       </TouchableOpacity>
                     </View>
+
+
                     <TouchableOpacity style={styles.ModalCloseButton} onPress={closeModal}>
-                    <Text style={styles.bottomButtonText}>닫기</Text>
-                  </TouchableOpacity>
+                      <Text style={styles.bottomButtonText}>닫기</Text>
+                    </TouchableOpacity>
 
                   </View>
                 </View>
+                
               
             </Modal>
             {/* 날씨정보 모달 */}
@@ -707,7 +773,7 @@ const styles = StyleSheet.create({
     height : 230
   },
   buttonText: {
-    color: 'black',
+    color: '#fff',
     fontWeight: 'bold'
   },
   HeadmodalView:{
@@ -793,38 +859,40 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
+    borderColor:'#000',
+    borderWidth:1
+    
   },
   optionContainer:{
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    margin: 5,
   },
   optionButton: {
-    backgroundColor: '#9adbc5',
-    borderRadius: 15,
+    width: 70,
+    height: 50,
     padding: 15,
-    marginRight: 10,
+    backgroundColor: "#9adbc5",
+    borderRadius: 15,
+    margin: 7,
+    alignItems: 'center',
+    justifyContent: 'center'
+    
   },
   optionText: {
     color: '#fff',
     fontWeight: '700',
   },
-  registerButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#4CAF50',
-    borderRadius: 15,
-    padding: 10,
-    marginLeft: 10,
-  },
   // 삭제 버튼
   deleteButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F44336', // 삭제 버튼 색상
+    width: 50,
+    height: 50,
+    padding: 15,
+    backgroundColor: "#fe8d6f",
     borderRadius: 15,
-    padding: 10,
-    marginLeft: 10,
+    margin: 7,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
 
 

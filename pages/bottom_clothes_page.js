@@ -9,7 +9,7 @@ const BottomClothesPage = () => {
                 {/*first cards*/}
                 <View style={styles.card}>
                     <View style={styles.iamgecard}>
-                        <Image source={require('app-cloring/assets/top1.png')} />
+                        <Image source={require('app-cloring/assets/jeans.png')}  style={styles.images}/>
                     </View>
                     <View style={styles.contentcard}>
                         <Text style={styles.texttitle}>청바지</Text>
@@ -29,7 +29,7 @@ const BottomClothesPage = () => {
                 </View>
                 <View style={styles.card}>
                     <View style={styles.iamgecard}>
-                        <Image source={require('app-cloring/assets/top1.png')} />
+                        <Image source={require('app-cloring/assets/slacks.png')}  style={styles.images}/>
                     </View>
                     <View style={styles.contentcard}>
                         <Text style={styles.texttitle}>슬랙스</Text>
@@ -82,8 +82,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    contentcard:{
-        
+    images:{
+        height: 90,
+        width: 90,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     texttitle : {
         fontWeight: '700',

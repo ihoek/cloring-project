@@ -9,7 +9,7 @@ const AccessoriesClothesPage = () => {
                 {/*first cards*/}
                 <View style={styles.card}>
                     <View style={styles.iamgecard}>
-                        <Image source={require('app-cloring/assets/top1.png')} />
+                        <Image source={require('app-cloring/assets/hat.png')}  style={styles.images} />
                     </View>
                     <View style={styles.contentcard}>
                         <Text style={styles.texttitle}>모자</Text>
@@ -32,7 +32,7 @@ const AccessoriesClothesPage = () => {
 
                 <View style={styles.card}>
                     <View style={styles.iamgecard}>
-                        <Image source={require('app-cloring/assets/top1.png')} />
+                        <Image source={require('app-cloring/assets/scarf.jpg')} style={styles.images} />
                     </View>
                     <View style={styles.contentcard}>
                         <Text style={styles.texttitle}>스카프</Text>
@@ -52,7 +52,7 @@ const AccessoriesClothesPage = () => {
 
                 <View style={styles.card}>
                     <View style={styles.iamgecard}>
-                        <Image source={require('app-cloring/assets/top1.png')} />
+                        <Image source={require('app-cloring/assets/tie.png')} style={styles.images}/>
                     </View>
                     <View style={styles.contentcard}>
                         <Text style={styles.texttitle}>넥타이</Text>
@@ -113,6 +113,12 @@ const styles = StyleSheet.create({
     },
     textsub:{
         margin : 5
+    },
+    images:{
+        height: 90,
+        width: 90,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
     
 });

@@ -31,7 +31,7 @@ const TopClothesPage = () => {
                 </View>
                 <View style={styles.card}>
                     <View style={styles.iamgecard}>
-                        <Image source={require('app-cloring/assets/top1.png')} />
+                        <Image source={require('app-cloring/assets/cardigan.png')}  style={styles.images} />
                     </View>
                     <View style={styles.contentcard}>
                         <Text style={styles.texttitle}>가디건</Text>
@@ -87,8 +87,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    contentcard:{
-        
+    iamges:{
+        height: 100,
+        width: 100,
     },
     texttitle : {
         fontWeight: '700',
@@ -96,7 +97,13 @@ const styles = StyleSheet.create({
     },
     textsub:{
         margin : 5
-    }
+    },
+    images:{
+        height: 90,
+        width: 90,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     
 });
 
