@@ -19,8 +19,7 @@ export default function Mainpage({ navigation, route }) {
     const [currentWeather, setCurrentWeather] = useState("");
 
     //현재 날씨 API one call 3.0 key
-    
-    
+
     //clothes_page에서 받은 이미지 저장 변수
     const [topImage, setTopImage] = useState(null);
     const [bottomImage, setBottomImage] = useState(null);
@@ -389,7 +388,15 @@ export default function Mainpage({ navigation, route }) {
                         </View>
                         <View style={styles.modalMidView}>
                             <Text style={styles.modalText}>전체적인 날씨</Text>
-                            <Text style={styles.modalText}>전반적으로 기온이 높아 더울 것으로 예상됩니다.</Text>
+                            {(currentWeather.temp_min - 275.15).toFixed(2) >= 30 ? (
+                            <Text style={styles.modalText}>전반적으로 기온이 높아 더울 것으로 예상됩니다</Text>
+                        ) : (currentWeather.temp_min - 275.15).toFixed(2) >= 20 ? (
+                            <Text style={styles.modalText}>전반적으로 날씨가 좋을 것으로 예상됩니다</Text>
+                        ) : (currentWeather.temp_min - 275.15).toFixed(2) >= 10 ? (
+                          <Text style={styles.modalText}>전반적으로 기온이 조금 낮을 것으로 예상됩니다</Text>
+                        ) : (
+                            <Text style={styles.modalText}>전반적으로 기온이 낮아 추울 것으로 예상됩니다</Text>
+                        )}
                         </View>
                         <View style={styles.modalBotView}>
                         {currentWeather && (
@@ -435,7 +442,15 @@ export default function Mainpage({ navigation, route }) {
                         <View>
                           <Text style={styles.modalText}>오늘은 온도는</Text>
                           <Text style={styles.modalText}>{(currentWeather.temp_min-275.15).toFixed(2)}°C</Text>
-                          <Text style={styles.modalText}>이므로 반팔에 긴바지와 같은 조합을 추천합니다</Text>
+                          {(currentWeather.temp_min - 275.15).toFixed(2) >= 30 ? (
+                            <Text style={styles.modalText}>이므로 반팔과 반 바지와 같은 조합을 추천합니다</Text>
+                        ) : (currentWeather.temp_min - 275.15).toFixed(2) >= 20 ? (
+                            <Text style={styles.modalText}>이므로 반팔과 긴 바지와 같은 조합을 추천합니다</Text>
+                        ) : (currentWeather.temp_min - 275.15).toFixed(2) >= 10 ? (
+                          <Text style={styles.modalText}>이므로 긴팔에 긴바지와 같은 조합을 추천합니다</Text>
+                        ) : (
+                            <Text style={styles.modalText}>이므로 패딩과 같이 따뜻하게 입는 것을 추천합니다</Text>
+                        )}
                         </View>
 
                         {/*bottom section*/}
@@ -535,6 +550,7 @@ export default function Mainpage({ navigation, route }) {
 
             {/* top section */}
             {/*<View style={styles.containerOne}>
+            <Image source={require('app-cloring/assets/mainlogo.png')} style={styles.mainlogo}/>
             </View>*/}
 
             {/* middle section */}
@@ -558,7 +574,7 @@ export default function Mainpage({ navigation, route }) {
             <View style={styles.containerFour}>
                 <TouchableOpacity style={styles.bottomButton01} onPress={() => { navigation.navigate('ClothesPage') }}><Image source={require('app-cloring/assets/clothe.png')} style={styles.clothebtn}/></TouchableOpacity>
                 <TouchableOpacity style={styles.bottomButton02}><Image source={require('app-cloring/assets/home.png')} style={styles.homebtn}/></TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton03} onPress={() => { navigation.navigate('MyPage') }}><Image source={require('app-cloring/assets/private.png')} style={styles.clothebtn}/></TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButton03} onPress={() => { navigation.navigate('PrivatePage') }}><Image source={require('app-cloring/assets/private.png')} style={styles.clothebtn}/></TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -567,13 +583,16 @@ export default function Mainpage({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1
-  },
+  }/*,
   containerOne: {
-    flex: 0.5,
+    flex: 0.3,
     backgroundColor : '#36251b',
-    justifyContent: 'center'//세로정렬
-    
+    justifyContent: 'center',//세로정렬
+    alignItems : 'center'
   },
+  mainlogo:{
+    width : 150
+  }*/,
   containerTwo: {
     flex: 0.5,
     flexDirection: 'row',

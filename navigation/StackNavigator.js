@@ -6,6 +6,7 @@ import ClothesPage from '../pages/clothes_page';
 
 const Stack = createStackNavigator();
 
+
 const StackNavigator = () => {
     return (
         <Stack.Navigator
@@ -18,8 +19,8 @@ const StackNavigator = () => {
                 headerBackTitleVisible: false
             }}
         >
-            <Stack.Screen name="MainPage" component={MainPage} />
-            <Stack.Screen name="MyPage" component={MyPage} />
+            <Stack.Screen name="Cloring" component={MainPage} />
+            <Stack.Screen name="PrivatePage" component={MyPage} />
             <Stack.Screen name="ClothesPage" component={ClothesPage} />
             
         </Stack.Navigator>

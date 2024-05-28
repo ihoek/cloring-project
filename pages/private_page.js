@@ -154,7 +154,7 @@ export default function MyPage({ onClose ,navigation}) {
         <TouchableOpacity style={styles.bottomButton01} onPress={() => { navigation.navigate('ClothesPage') }}>
           <Image source={require('app-cloring/assets/clothe.png')} style={styles.clothebtn}/>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomButton02} onPress={() => { navigation.navigate('MainPage') }}>
+        <TouchableOpacity style={styles.bottomButton02} onPress={() => { navigation.navigate('Cloring') }}>
           <Image source={require('app-cloring/assets/home.png')} style={styles.homebtn}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.bottomButton03}>

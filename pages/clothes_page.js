@@ -110,21 +110,21 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
         if (image) {
             if (category === '상의') {
                 console.log('상의가 전송되고 있음');
-                navigation.navigate('MainPage', {
+                navigation.navigate('Cloring', {
                     topImage: image,
                     topProductName: productName,
                     topMaterial: material,
                     topPurchaseDate: purchaseDate
                 });
             } else if (category === '하의') {
-                navigation.navigate('MainPage', {
+                navigation.navigate('Cloring', {
                     bottomImage: image,
                     botProductName: productName,
                     botMaterial: material,
                     botPurchaseDate: purchaseDate
                 });
             } else if (category === '악세사리') {
-                navigation.navigate('MainPage', {
+                navigation.navigate('Cloring', {
                     accessoryImage: image,
                     accessoryProductName: productName,
                     accessoryMaterial: material,
@@ -133,7 +133,7 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
             }
         } else {
             // 이미지가 없는 경우 디폴트 이미지로 넘겨줄 수 있습니다.
-            navigation.navigate('MainPage', {
+            navigation.navigate('Cloring', {
                 topImage: require('app-cloring/assets/top1.png'),
                 topProductName: productName,
                 topMaterial: material,
@@ -380,8 +380,8 @@ export default function ClothesPage({ onClose, navigation, route, content }) {
             </View>
             <View style={styles.containerFour}>
             <TouchableOpacity style={styles.bottomButton01} onPress={() => { navigation.navigate('ClothesPage') }}><Image source={require('app-cloring/assets/clothe.png')} style={styles.clothebtn}/></TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton02}  onPress={() => { navigation.navigate('MainPage')}}><Image source={require('app-cloring/assets/home.png')} style={styles.homebtn}/></TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton03} onPress={() => { navigation.navigate('MyPage') }}><Image source={require('app-cloring/assets/private.png')} style={styles.clothebtn}/></TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButton02}  onPress={() => { navigation.navigate('Cloring')}}><Image source={require('app-cloring/assets/home.png')} style={styles.homebtn}/></TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButton03} onPress={() => { navigation.navigate('PrivatePage') }}><Image source={require('app-cloring/assets/private.png')} style={styles.clothebtn}/></TouchableOpacity>
             </View>
         </SafeAreaView>
     );
